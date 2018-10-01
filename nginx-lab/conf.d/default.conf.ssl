@@ -1,1 +1,24 @@
+upstream backend {
+   server apache-01.tigo.com.gt:80; 
+   server apache-02.tigo.com.gt:80;
+   server apache-03.tigo.com.gt:80;
+}
 
+# This server accepts all traffic to port 80 and passes it to the upstream. 
+# Notice that the upstream name and the proxy_pass need to match.
+
+server {
+   listen 80;
+   listen 443 http2 ssl;
+   listen [::]:443 http2 ssl;
+   
+   server_name sslnginx.tigo.com.gt;
+
+   ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+   ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+   ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+   location / {
+      proxy_pass http://backend;
+   }
+}
